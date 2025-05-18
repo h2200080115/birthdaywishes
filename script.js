@@ -5,7 +5,8 @@ let w = (c.width = window.innerWidth),
 (hh = h / 2),
   (opts = {
     // change the text in here //
-    strings: ["HAPPY", "BIRTHDAY!", "Ammuuuuu❤️❤️"],
+    strings: ["HAPPY", "BIRTHDAY", "AMMUUU❤️❤️"],
+    loveMessage: "I LOVE U❤️",
     charSize: 30,
     charSpacing: 35,
     lineHeight: 40,
@@ -44,6 +45,10 @@ let w = (c.width = window.innerWidth),
     balloonAddedVel: 0.4,
     balloonBaseRadian: -(Math.PI / 2 - 0.5),
     balloonAddedRadian: -1,
+    loveMessageDelay: 0, // Changed to 0 for immediate appearance
+    showLoveMessage: false,
+    loveMessageShown: false,
+    currentPhase: "birthday", // Track current animation phase
   }),
   (calc = {
     totalWidth:
@@ -361,17 +366,30 @@ function anim() {
 
   ctx.translate(hw, hh);
 
-  var done = true;
-  for (var l = 0; l < letters.length; ++l) {
-    letters[l].step();
-    if (letters[l].phase !== "done") done = false;
+  if (opts.currentPhase === "birthday") {
+    var done = true;
+    for (var l = 0; l < letters.length; ++l) {
+      letters[l].step();
+      if (letters[l].phase !== "done") done = false;
+    }
+
+    if (done) {
+      opts.currentPhase = "love";
+      letters = [];
+      var loveLetter = new Letter(opts.loveMessage, 0, 0);
+      letters.push(loveLetter);
+    }
+  } else if (opts.currentPhase === "love") {
+    for (var l = 0; l < letters.length; ++l) {
+      letters[l].step();
+    }
   }
 
   ctx.translate(-hw, -hh);
-
-  if (done) for (var l = 0; l < letters.length; ++l) letters[l].reset();
 }
 
+// Initialize letters array with birthday messages
+letters = [];
 for (let i = 0; i < opts.strings.length; ++i) {
   for (var j = 0; j < opts.strings[i].length; ++j) {
     letters.push(
